@@ -2,24 +2,27 @@
 const nodemailer = require('nodemailer');
 
 // 1. Configure the email transporter
+// --- THIS IS THE FIX ---
+// We are replacing the simple 'service: "gmail"' with a more robust
+// configuration that is more reliable on servers like Render.
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // use SSL
   auth: {
     user: process.env.EMAIL_USER, // Your email from .env
     pass: process.env.EMAIL_PASS, // Your app password from .env
   },
 });
+// --- END OF FIX ---
 
 // 2. Create the function to send the emails
-const sendConfirmationEmails = async (application, downloadLink) => {
+// (This function is unchanged and correct)
+const sendConfirmationEmails = async (application, downloadLink, adminPageUrl) => {
   const { fullName, email, businessName } = application;
   const adminEmail = process.env.ADMIN_EMAIL;
-  
-  // --- Get the Admin Page URL from .env ---
-  const adminPageUrl = process.env.ADMIN_PAGE_URL;
 
-  // --- Email 1: To the Applicant (This is perfect) ---
-  // (Contains the direct PDF download link)
+  // --- Email 1: To the Applicant ---
   const applicantMailOptions = {
     from: `"PSNA Technology Foundation" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -34,8 +37,7 @@ const sendConfirmationEmails = async (application, downloadLink) => {
     `,
   };
 
-  // --- Email 2: To the Admin (This is the updated part) ---
-  // (Contains the link to the Admin Dashboard)
+  // --- Email 2: To the Admin ---
   const adminMailOptions = {
     from: `"${fullName} (Application)" <${process.env.EMAIL_USER}>`,
     to: adminEmail,
@@ -62,7 +64,6 @@ const sendConfirmationEmails = async (application, downloadLink) => {
     console.log(`Notification email sent to admin`);
   } catch (error) {
     console.error('Error sending emails:', error);
-    // We throw the error so the main route can catch it
     throw new Error('Failed to send confirmation emails.');
   }
 };
