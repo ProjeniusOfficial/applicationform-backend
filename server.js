@@ -11,8 +11,7 @@ const port = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:3000', // For local frontend testing
   'http://localhost:3001', // For local admin page testing (if you use a different port)
-  // 'https://your-application-form-url.vercel.app',  <-- Add this later
-  // 'https://your-admin-page-url.vercel.app'       <-- Add this later
+   'https://admin-dashboard-jet-mu-14.vercel.app/'
 ];
 
 const corsOptions = {
